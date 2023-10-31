@@ -1,20 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx
-  labels: 
-    app: k8s-deployment
-spec: 
-  replicas: 3
+  name: {{ include "nginx-reverse-proxy.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
   selector:
-    matchlabels:
-      project: stan-project
+    matchLabels:
+      app: nginx-reverse-proxy
   template:
     metadata:
       labels:
-        project: stan-project
+        app: nginx-reverse-proxy
     spec:
       containers:
-        - name:
-          image:
-          ports: 80 
+        - name: nginx-reverse-proxy
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ include "nginx-reverse-proxy.fullname" . }}-configmap

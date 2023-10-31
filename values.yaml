@@ -1,3 +1,28 @@
-favorite:
-  drink: coffee
-  food: pizza
+replicaCount: 1
+image:
+  repository: nginx
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  name: nginx-reverse-proxy
+  type: ClusterIP
+  port: 80
+configMap:
+  nginx.conf: |
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      server {
+        listen 80;
+        server_name localhost;
+
+        location / {
+          proxy_pass http://backend-service;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+      }
+    }
