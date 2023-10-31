@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels: 
+    app: k8s-deployment
+spec: 
+  replicas: 3
+  selector:
+    matchlabels:
+      project: stan-project
+  template:
+    metadata:
+      labels:
+        project: stan-project
+    spec:
+      containers:
+        - name:
+          image:
+          ports: 80 
